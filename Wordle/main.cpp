@@ -21,6 +21,33 @@ int AskInt(int min, int max)
 }
 
 
+bool GreenCheck(int index, char guess[], const char* chaseWord)
+{
+	return guess[index] == chaseWord[index];
+}
+
+const char* GetColor(int guessIndex, char guess[], const char* chaseWord, bool usedChaseWordLetters[])
+{
+	if (GreenCheck(guessIndex, guess, chaseWord))
+		return GREEN;
+	else
+	{
+		bool match = false;
+		int chaseIndex = 0;
+		while (chaseIndex < 6)
+		{
+			// check carac trouvé aut' part				   check carac pas déjà trouvé par autre lettre       check carac pas vert (auquel cas on laisse car prio au vert)
+			if (guess[guessIndex] == chaseWord[chaseIndex] && !(usedChaseWordLetters[chaseIndex]) && !((guess[chaseIndex] == chaseWord[chaseIndex])))
+			{
+				usedChaseWordLetters[chaseIndex] = true;
+				return YELLOW;
+			}
+			chaseIndex++;
+		}
+		return DEFAULT;
+	}
+}
+
 int main()
 {
 	srand(time(NULL));
@@ -99,7 +126,6 @@ int main()
 			}
 
 			wordList[0] = chaseWord;
-			cout << chaseWord << endl;
 			nbBannedWords++;
 			
 			int selecIndex = 0;
@@ -110,35 +136,16 @@ int main()
 			while (win == 0)
 			{
 				system("cls");
-				for (int i = 0; i < nbAttemps; i++)
+				for (int line = 0; line < nbAttemps; line++)
 				{
 					bool usedLetters[] = { false, false, false, false, false };
-					const char* colors[] = { DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT, };
 					int score = 0;
-					for (int j = 0; j < 5; j++)
+					for (int column = 0; column < 5; column++)
 					{
-						if (grid[i][j] == chaseWord[j])
-						{
-							colors[j] = GREEN;
+						const char* color = GetColor(column, grid[line], chaseWord, usedLetters);
+						if (color == GREEN)
 							score++;
-						}
-						else
-						{
-							bool match = false;
-							int k = 0;
-							while (!(match) && k < 5)
-							{
-								if (chaseWord[k] == grid[i][j] && !(usedLetters[k]) && chaseWord[k] != grid[i][k])
-								{
-									usedLetters[k] = true;
-									match = true;
-									colors[j] = YELLOW;
-								}
-								k++;
-							}
-						}
-						cout << colors[j];
-						cout << grid[i][j] << " ";
+						cout << color << grid[line][column] << DEFAULT << " ";
 					}
 					if (score == 5)
 						win = 1;
@@ -183,8 +190,7 @@ int main()
 							selecIndex--;
 
 						else
-							selecIndex++;
-					}
+							selecIndex++;					}
 
 					if (input == 0 || input == 224)
 					{
