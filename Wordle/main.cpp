@@ -163,6 +163,10 @@ int main()
 					cout << DEFAULT;
 					cout << endl;
 				}
+				else
+				{
+					cout << "_ _ _ _ _" << endl;
+				}
 
 				for (int i = nbAttemps + 1; i < 6; i++)
 				{
